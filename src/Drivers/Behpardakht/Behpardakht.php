@@ -107,7 +107,41 @@ class Behpardakht extends Driver
         }
 
         return $this->redirectWithForm($payUrl, $data, 'POST');
+    }   
+
+    public function refund($orderId , $saleOrderId , $saleRefrenceId , $refundAmount){
+
+        if (isset($_SERVER['SERVER_PROTOCOL']) && $_SERVER['SERVER_PROTOCOL'] == "HTTP/2.0") {
+            $context = stream_context_create(
+                [
+                'ssl' => array(
+                  'verify_peer'       => false,
+                  'verify_peer_name'  => false
+                )]
+            );
+
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl, [
+                'stream_context' => $context
+            ]);
+        } else {
+            $soap = new \SoapClient($this->settings->apiPurchaseUrl);
+        }
+		
+        $data =  array(
+            'terminalId' => $this->settings->terminalId,
+            'userName' => $this->settings->username,
+            'userPassword' => $this->settings->password,
+            'orderId' => $orderId,
+            'saleOrderId' => $saleOrderId,
+            'saleReferenceId' => $saleRefrenceId,
+            'refundAmount' => $refundAmount,
+        );;
+		
+        $res = $soap->bpRefundRequest($data);
+		return $this->translateStatus($res->return);
     }
+
+
 
     /**
      * Verify payment

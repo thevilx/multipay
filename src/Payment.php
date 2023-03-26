@@ -253,6 +253,22 @@ class Payment
         return $this->driverInstance->pay();
     }
 
+     /**
+     * refund request
+     *
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public function refund($orderId , $saleOrderId , $saleRefrenceId , $refundAmount)
+    {
+       $this->driverInstance = $this->getFreshDriverInstance();
+       $reversal = $this->driverInstance->refund($orderId , $saleOrderId , $saleRefrenceId , $refundAmount);
+	
+        return $reversal;
+    }
+    
     /**
      * Verifies the payment
      *
